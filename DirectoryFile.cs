@@ -34,7 +34,7 @@ namespace AquaGold
                 if (fileInfo.DirectoryName.Equals(directoryPath))
                     currentPath = DIRECTORY_ROOT_NAME;
                 else
-                    currentPath = new DirectoryInfo(fileInfo.DirectoryName).Name;
+                    currentPath = fileInfo.DirectoryName.Replace(directoryPath, string.Empty).Remove(0, 1);
 
                 if (!DirectoryFiles.ContainsKey(currentPath))
                 {
