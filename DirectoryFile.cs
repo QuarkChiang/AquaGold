@@ -2,22 +2,16 @@
 
 namespace AquaGold
 {
-    public struct FileCrc
+    public struct FileCrc(FileInfo fileInfo, string sha512)
     {
-        public FileCrc(FileInfo fileInfo, string sha512)
-        {
-            Info = fileInfo;
-            SHA512 = sha512;
-        }
-
-        public FileInfo Info { get; private set; }
-        public string SHA512 { get; private set; }
+        public FileInfo Info { get; private set; } = fileInfo;
+        public string SHA512 { get; private set; } = sha512;
     }
 
     internal class DirectoryFile
     {
         public const string DIRECTORY_ROOT_NAME = "root";
-        public Dictionary<string, List<FileCrc>> DirectoryFiles { get; private set; } = new();
+        public Dictionary<string, List<FileCrc>> DirectoryFiles { get; private set; } = [];
 
         public void GenerateDirectoryFiles(string directoryPath)
         {
@@ -36,16 +30,16 @@ namespace AquaGold
                 else
                     currentPath = fileInfo.DirectoryName.Replace(directoryPath, string.Empty).Remove(0, 1);
 
-                if (!DirectoryFiles.ContainsKey(currentPath))
+                if (!DirectoryFiles.TryGetValue(currentPath, out List<FileCrc>? value))
                 {
-                    List<FileCrc> files = new()
-                    {
+                    List<FileCrc> files =
+                    [
                         new FileCrc(fileInfo, sha512)
-                    };
+                    ];
                     DirectoryFiles.Add(currentPath, files);
                 }
                 else
-                    DirectoryFiles[currentPath].Add(new FileCrc(fileInfo, sha512));
+                    value.Add(new FileCrc(fileInfo, sha512));
             }
         }
 

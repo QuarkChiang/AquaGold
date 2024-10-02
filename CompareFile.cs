@@ -13,29 +13,22 @@
                     if (sourceValue == null)
                         throw new ArgumentNullException($"Key : {targetItem.Key}, SourceValue Is Null.");
 
-                    var diffFileList = targetItem.Value.
-                        Where(target => !sourceValue.Any(source => target.SHA512 == source.SHA512 && target.Info.Name.Equals(source.Info.Name)));
+                    var diffFileList = targetItem.Value
+                        .Where(target => !sourceValue.Any(source => target.SHA512 == source.SHA512 && target.Info.Name.Equals(source.Info.Name)))
+                        .ToList();
 
-                    if (diffFileList != null)
+                    if (diffFileList.Count > 0)
                     {
-                        foreach (var file in diffFileList)
-                        {
-                            if (DiffFiles.TryGetValue(targetItem.Key, out List<FileCrc>? value))
-                                value.Add(file);
-                            else
-                            {
-                                List<FileCrc> files = new()
-                                {
-                                    file
-                                };
-                                DiffFiles.Add(targetItem.Key, files);
-                            }
-                        }
+                        if (DiffFiles.TryGetValue(targetItem.Key, out List<FileCrc>? value))
+                            value.AddRange(diffFileList);
+                        else
+                            DiffFiles.Add(targetItem.Key, diffFileList);
                     }
-
                 }
                 else
+                {
                     DiffFiles.Add(targetItem.Key, targetItem.Value);
+                }
             }
         }
     }
